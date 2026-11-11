@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Order confirmed - BASCA</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#F4E9D8; --cream-soft:#EADFC9; --charcoal:#1C1714; --caramel:#D9822B; --burnt:#6E3B1F; --muted:#7A6A57;}
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--cream); color:var(--charcoal); font-family:'Inter',Arial,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Archivo',Arial,sans-serif; margin:0; line-height:1.1;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--caramel); outline-offset:3px;}
+  .bar{background:var(--charcoal); color:var(--cream); display:flex; align-items:center; justify-content:space-between; padding:10px clamp(20px,4vw,48px);}
+  .bar svg{width:56px; height:56px; display:block;}
+  .bar a.back{text-decoration:none; font-weight:500; font-size:0.95rem; border-bottom:1px solid var(--caramel); padding-bottom:2px;}
+  .page{max-width:680px; margin:0 auto; padding:clamp(48px,8vw,96px) clamp(20px,4vw,48px);}
+  h1{font-weight:900; font-size:clamp(2.2rem,4vw + 1rem,3.4rem);}
+  .lead{color:var(--muted); font-size:1.1rem; margin:14px 0 0;}
+  .card{border:2px solid var(--charcoal); background:var(--cream-soft); padding:26px 24px; margin-top:36px;}
+  .when{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:clamp(1.5rem,2vw + 1rem,2rem); color:var(--burnt);}
+  dl{margin:20px 0 0; display:grid; grid-template-columns:auto 1fr; gap:10px 20px;}
+  dt{color:var(--muted);}
+  dd{margin:0; font-weight:500; white-space:pre-line;}
+  .help{margin-top:32px; color:var(--muted);}
+  .help a{border-bottom:1px solid var(--caramel); text-decoration:none; color:var(--charcoal); font-weight:600;}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a href="/" aria-label="BASCA home">
+    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="150" cy="150" r="145" fill="#1C1714" stroke="#F4E9D8" stroke-width="6"/>
+      <text x="150" y="146" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="800" font-size="46" letter-spacing="2" fill="#F4E9D8">BASCA</text>
+      <path d="M90,175 L110,168 L122,178 L138,165 L154,179 L170,169 L190,175" stroke="#D9822B" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="150" cy="235" r="15" fill="#D9822B"/>
+    </svg>
+  </a>
+  <a class="back" href="/">Back to the site</a>
+</header>
+<main class="page" aria-live="polite">
+  <h1 id="title">Checking your payment…</h1>
+  <p class="lead" id="lead"></p>
+  <div class="card" id="card" hidden>
+    <div class="when" id="when"></div>
+    <dl>
+      <dt>Cakes</dt><dd id="cakes"></dd>
+      <dt>Paid</dt><dd id="total"></dd>
+      <dt>Pickup at</dt><dd id="address"></dd>
+    </dl>
+  </div>
+  <p class="help">Need to change something? Message us on <a href="https://wa.me/351931498512">WhatsApp</a>.</p>
+</main>
+<script>
+(async () => {
+  const $ = (id) => document.getElementById(id);
+  const fmt = (iso) => new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
+    .format(new Date(iso + 'T00:00:00Z'));
+  const slot = (h) => `${String(h).padStart(2, '0')}:00–${String(h + 1).padStart(2, '0')}:00`;
+  const euros = (c) => '€' + (c / 100).toFixed(2).replace('.00', '');
+  const sessionId = new URLSearchParams(location.search).get('session_id');
+
+  for (let attempt = 0; attempt < 6; attempt++) {
+    try {
+      const res = await fetch('/api/order-status?session_id=' + encodeURIComponent(sessionId || ''), { cache: 'no-store' });
+      const o = await res.json();
+      if (!res.ok) throw new Error(o.error);
+      if (o.status === 'paid') {
+        $('title').textContent = `Thank you, ${o.name}. Your BASCA is booked.`;
+        $('lead').textContent = 'Stripe has emailed you a receipt. See you at pickup.';
+        $('when').textContent = `${fmt(o.date)}, ${slot(o.slot)}`;
+        $('cakes').textContent = Object.entries(o.items).filter(([, q]) => q > 0).map(([c, q]) => `${q}× ${c}`).join(', ');
+        $('total').textContent = euros(o.total);
+        $('address').textContent = o.pickupAddress || 'We will message you the address before pickup.';
+        $('card').hidden = false;
+        return;
+      }
+      if (o.status === 'processing') {
+        $('title').textContent = 'Payment is being confirmed';
+        $('lead').textContent = 'Approve it in your MB WAY app if you haven\'t yet. This page updates by itself.';
+      }
+    } catch (e) {
+      $('title').textContent = 'We couldn\'t find this order';
+      $('lead').textContent = 'If you were charged, message us on WhatsApp and we\'ll sort it out.';
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 4000));
+  }
+})();
+</script>
+</body>
+</html>

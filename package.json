@@ -1,0 +1,9 @@
+{
+  "name": "basca-site",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "2.45.4",
+    "stripe": "17.2.0"
+  }
+}

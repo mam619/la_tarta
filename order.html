@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order a BASCA - Basque cheesecake, Lisboa</title>
+<meta name="description" content="Order a BASCA Basque cheesecake for pickup in Alcântara, Lisboa. Choose your day and time, pay online.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F4E9D8;
+    --cream-soft:#EADFC9;
+    --charcoal:#1C1714;
+    --caramel:#D9822B;
+    --burnt:#6E3B1F;
+    --muted:#7A6A57;
+    --maxw:1100px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--cream); color:var(--charcoal);
+    font-family:'Inter',Arial,sans-serif; font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Archivo',Arial,sans-serif; margin:0; line-height:1.1;}
+  a{color:inherit;}
+  button{font:inherit; color:inherit;}
+  :focus-visible{outline:2px solid var(--caramel); outline-offset:3px;}
+  [hidden]{display:none !important;}
+
+  /* header */
+  .bar{
+    background:var(--charcoal); color:var(--cream);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px clamp(20px,4vw,48px);
+  }
+  .bar svg{width:56px; height:56px; display:block;}
+  .bar a.back{text-decoration:none; font-weight:500; font-size:0.95rem; border-bottom:1px solid var(--caramel); padding-bottom:2px;}
+
+  .page{
+    max-width:var(--maxw); margin:0 auto;
+    padding:clamp(40px,7vw,80px) clamp(20px,4vw,48px) clamp(64px,10vw,120px);
+  }
+  .intro h1{font-weight:900; font-size:clamp(2.2rem,4vw + 1rem,3.6rem);}
+  .intro p{color:var(--muted); font-size:1.1rem; margin:14px 0 0; max-width:52ch;}
+
+  .layout{
+    display:grid; grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
+    gap:clamp(32px,5vw,64px); margin-top:clamp(36px,5vw,56px); align-items:start;
+  }
+  @media (max-width:860px){ .layout{grid-template-columns:1fr;} }
+
+  /* steps */
+  .step{padding-bottom:40px; margin-bottom:40px; border-bottom:2px solid var(--cream-soft);}
+  .step:last-child{border-bottom:0; margin-bottom:0;}
+  .step-head{display:flex; align-items:baseline; gap:14px;}
+  .step-num{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:2rem; color:var(--caramel); line-height:1;}
+  .step h2{font-size:clamp(1.4rem,1vw + 1.1rem,1.8rem); font-weight:800;}
+  .hint{color:var(--muted); font-size:0.92rem; margin:10px 0 0;}
+
+  /* cakes */
+  .cakes{display:grid; gap:12px; margin-top:22px;}
+  .cake{
+    display:grid; grid-template-columns:1fr auto; align-items:center; gap:16px;
+    border:2px solid var(--burnt); padding:18px 20px;
+  }
+  .cake h3{font-size:1.15rem; font-weight:800;}
+  .cake p{margin:2px 0 0; color:var(--muted); font-size:0.95rem;}
+  .cake .price{font-family:'Archivo',Arial,sans-serif; font-weight:800; color:var(--burnt); font-size:1.15rem; margin-top:6px;}
+  .stepper{display:flex; align-items:center; border:2px solid var(--charcoal);}
+  .stepper button{
+    width:44px; height:44px; border:0; background:none; cursor:pointer;
+    font-family:'Archivo',Arial,sans-serif; font-weight:800; font-size:1.3rem;
+  }
+  .stepper button:hover:not(:disabled){background:var(--cream-soft);}
+  .stepper button:disabled{color:var(--muted); opacity:0.4; cursor:not-allowed;}
+  .stepper output{
+    min-width:36px; text-align:center; font-family:'Archivo',Arial,sans-serif;
+    font-weight:900; font-size:1.25rem;
+  }
+
+  /* calendar */
+  .month{margin-top:26px;}
+  .month h3{font-size:1rem; font-weight:700; margin-bottom:10px;}
+  .weekdays, .days{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px;}
+  .weekdays span{font-size:0.8rem; color:var(--muted); text-align:center; padding-bottom:4px;}
+  .day{
+    aspect-ratio:1 / 1; min-height:48px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border:2px solid var(--burnt); background:var(--cream); cursor:pointer; padding:2px;
+  }
+  .day .n{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:clamp(1.05rem,1.6vw + 0.5rem,1.6rem); line-height:1;}
+  .day .left{font-size:0.7rem; color:var(--muted); margin-top:4px; line-height:1;}
+  .day:hover:not(:disabled){border-color:var(--charcoal);}
+  .day[aria-pressed="true"]{background:var(--charcoal); border-color:var(--charcoal); color:var(--cream);}
+  .day[aria-pressed="true"] .left{color:var(--cream-soft);}
+  .day:disabled{border-color:transparent; background:var(--cream-soft); color:var(--muted); cursor:not-allowed;}
+  .day:disabled .n{font-weight:700; opacity:0.55;}
+  .blank{aspect-ratio:1 / 1;}
+  @media (max-width:420px){ .day .left{display:none;} }
+
+  /* slots */
+  .slots{display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; margin-top:22px;}
+  .slot{
+    border:2px solid var(--burnt); background:var(--cream); padding:12px 8px; cursor:pointer;
+    font-family:'Archivo',Arial,sans-serif; font-weight:700; font-size:1rem;
+  }
+  .slot:hover{border-color:var(--charcoal);}
+  .slot[aria-pressed="true"]{background:var(--charcoal); border-color:var(--charcoal); color:var(--cream);}
+
+  /* details */
+  .fields{display:grid; grid-template-columns:1fr 1fr; gap:18px 16px; margin-top:22px;}
+  .field{display:flex; flex-direction:column; gap:6px;}
+  .field.wide{grid-column:1 / -1;}
+  .field label{font-weight:600; font-size:0.95rem;}
+  .field label span{font-weight:400; color:var(--muted);}
+  .field input, .field textarea{
+    font:inherit; color:var(--charcoal); background:var(--cream);
+    border:2px solid var(--burnt); border-radius:0; padding:11px 12px; width:100%;
+  }
+  .field textarea{min-height:84px; resize:vertical;}
+  .field input:focus, .field textarea:focus{outline:none; border-color:var(--charcoal);}
+  @media (max-width:560px){ .fields{grid-template-columns:1fr;} }
+
+  /* summary */
+  .summary{
+    position:sticky; top:24px;
+    background:var(--cream-soft); border:2px solid var(--charcoal); padding:26px 24px;
+  }
+  @media (max-width:860px){ .summary{position:static;} }
+  .summary h2{font-size:1.3rem; font-weight:800;}
+  .summary dl{margin:18px 0 0; display:grid; grid-template-columns:auto 1fr; gap:8px 16px;}
+  .summary dt{color:var(--muted); font-size:0.92rem;}
+  .summary dd{margin:0; text-align:right; font-weight:500;}
+  .total{
+    display:flex; justify-content:space-between; align-items:baseline;
+    border-top:2px solid var(--charcoal); margin-top:20px; padding-top:16px;
+  }
+  .total span{font-weight:600;}
+  .total strong{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:2.1rem; color:var(--burnt);}
+  .pay{
+    width:100%; margin-top:20px; padding:16px; border:0; cursor:pointer;
+    background:var(--charcoal); color:var(--cream);
+    font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:1.25rem;
+  }
+  .pay:hover:not(:disabled){background:var(--burnt);}
+  .pay:disabled{background:var(--muted); cursor:not-allowed;}
+  .missing{font-size:0.9rem; color:var(--muted); margin:10px 0 0; text-align:center;}
+  .small{font-size:0.85rem; color:var(--muted); margin:16px 0 0;}
+
+  .notice{border-left:3px solid var(--caramel); padding:10px 0 10px 18px; margin-top:24px;}
+  .notice.error{border-color:#A3321A; color:#7C2410; font-weight:500;}
+  .loading{color:var(--muted); margin-top:22px;}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a href="/" aria-label="BASCA home">
+    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="150" cy="150" r="145" fill="#1C1714" stroke="#F4E9D8" stroke-width="6"/>
+      <text x="150" y="146" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="800" font-size="46" letter-spacing="2" fill="#F4E9D8">BASCA</text>
+      <path d="M90,175 L110,168 L122,178 L138,165 L154,179 L170,169 L190,175" stroke="#D9822B" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="150" cy="235" r="15" fill="#D9822B"/>
+    </svg>
+  </a>
+  <a class="back" href="/">Back to the site</a>
+</header>
+
+<main class="page">
+  <div class="intro">
+    <h1>Order a BASCA</h1>
+    <p id="rulesLine">Pickup in Alcântara, Wednesday to Sunday. Order by 18:00 two days before.</p>
+    <p class="notice" id="cancelledNotice" hidden>Payment cancelled. Your cakes are no longer held, so pick again whenever you're ready.</p>
+  </div>
+
+  <div class="layout">
+    <div>
+      <section class="step" aria-labelledby="h-cakes">
+        <div class="step-head"><span class="step-num">1</span><h2 id="h-cakes">Your cakes</h2></div>
+        <div class="cakes" id="cakes"><p class="loading">Loading…</p></div>
+        <p class="hint" id="maxHint"></p>
+      </section>
+
+      <section class="step" aria-labelledby="h-day">
+        <div class="step-head"><span class="step-num">2</span><h2 id="h-day">Pickup day</h2></div>
+        <div id="calendar"><p class="loading">Loading available days…</p></div>
+      </section>
+
+      <section class="step" aria-labelledby="h-time">
+        <div class="step-head"><span class="step-num">3</span><h2 id="h-time">Pickup time</h2></div>
+        <p class="hint" id="slotHint">Pick a day first.</p>
+        <div class="slots" id="slots" role="group" aria-labelledby="h-time"></div>
+      </section>
+
+      <section class="step" aria-labelledby="h-details">
+        <div class="step-head"><span class="step-num">4</span><h2 id="h-details">Your details</h2></div>
+        <div class="fields">
+          <div class="field wide"><label for="name">Name</label><input id="name" autocomplete="name" maxlength="80"></div>
+          <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" maxlength="120"></div>
+          <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel" maxlength="30" placeholder="+351"></div>
+          <div class="field"><label for="nif">NIF <span>(optional, for your invoice)</span></label><input id="nif" inputmode="numeric" maxlength="11"></div>
+          <div class="field wide"><label for="notes">Note <span>(optional)</span></label><textarea id="notes" maxlength="300"></textarea></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="summary" aria-labelledby="h-summary">
+      <h2 id="h-summary">Your order</h2>
+      <dl>
+        <dt>Cakes</dt><dd id="sumCakes">None yet</dd>
+        <dt>Pickup</dt><dd id="sumDay">Choose a day</dd>
+        <dt>Time</dt><dd id="sumSlot">Choose a time</dd>
+        <dt>Where</dt><dd>Alcântara, Lisboa</dd>
+      </dl>
+      <div class="total"><span>Total</span><strong id="sumTotal">€0</strong></div>
+      <button class="pay" id="payBtn" disabled>Pay</button>
+      <p class="missing" id="missing"></p>
+      <div class="notice error" id="errorBox" role="alert" hidden></div>
+      <p class="small">Card, Apple Pay, Google Pay or MB WAY, through Stripe. The exact pickup address is shown once you've paid.</p>
+    </aside>
+  </div>
+</main>
+
+<script>
+(() => {
+  const state = { rules: null, products: [], days: [], items: {}, date: null, slot: null, busy: false };
+  const $ = (id) => document.getElementById(id);
+
+  const euros = (c) => '€' + (c / 100).toFixed(2).replace('.00', '');
+  const asDate = (iso) => new Date(iso + 'T00:00:00Z');
+  const fmt = (iso, opts) => new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: 'UTC' }).format(asDate(iso));
+  const slotText = (h) => `${String(h).padStart(2, '0')}:00–${String(h + 1).padStart(2, '0')}:00`;
+  const cakeCount = () => Object.values(state.items).reduce((a, b) => a + b, 0);
+  const totalCents = () => state.products.reduce((t, p) => t + (state.items[p.code] || 0) * p.price_cents, 0);
+  const dayInfo = (iso) => state.days.find((d) => d.date === iso);
+
+  async function loadAvailability() {
+    const res = await fetch('/api/availability', { cache: 'no-store' });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Could not load availability.');
+    state.rules = data.rules;
+    state.products = data.products;
+    state.days = data.days;
+    if (!Object.keys(state.items).length) {
+      data.products.forEach((p, i) => (state.items[p.code] = i === 0 ? 1 : 0));
+    }
+    const r = data.rules;
+    $('rulesLine').textContent =
+      `Pickup in Alcântara. Order by ${String(r.cutoffHour).padStart(2, '0')}:00, ${r.leadDays} days before pickup.`;
+    $('maxHint').textContent = `Up to ${r.maxCakes} cakes per order.`;
+    if (state.date && !(dayInfo(state.date)?.open && dayInfo(state.date).remaining >= cakeCount())) {
+      state.date = null; state.slot = null;
+    }
+    render();
+  }
+
+  function renderCakes() {
+    const max = state.rules.maxCakes;
+    const wrap = $('cakes');
+    wrap.innerHTML = '';
+    state.products.forEach((p) => {
+      const q = state.items[p.code] || 0;
+      const row = document.createElement('div');
+      row.className = 'cake';
+      row.innerHTML = `
+        <div><h3></h3><p></p><div class="price"></div></div>
+        <div class="stepper">
+          <button type="button" data-d="-1">−</button>
+          <output aria-live="polite"></output>
+          <button type="button" data-d="1">+</button>
+        </div>`;
+      row.querySelector('h3').textContent = p.name;
+      row.querySelector('p').textContent = p.description || '';
+      row.querySelector('.price').textContent = euros(p.price_cents);
+      row.querySelector('output').textContent = q;
+      const [minus, plus] = row.querySelectorAll('button');
+      minus.setAttribute('aria-label', `One fewer ${p.name}`);
+      plus.setAttribute('aria-label', `One more ${p.name}`);
+      minus.disabled = q === 0;
+      plus.disabled = cakeCount() >= max;
+      row.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+        state.items[p.code] = Math.max(0, q + Number(b.dataset.d));
+        const info = state.date && dayInfo(state.date);
+        if (info && info.remaining < cakeCount()) { state.date = null; state.slot = null; }
+        render();
+      }));
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderCalendar() {
+    const need = Math.max(cakeCount(), 1);
+    const cal = $('calendar');
+    cal.innerHTML = '';
+    const months = new Map();
+    state.days.forEach((d) => {
+      const key = d.date.slice(0, 7);
+      if (!months.has(key)) months.set(key, []);
+      months.get(key).push(d);
+    });
+    if (!state.days.some((d) => d.open)) {
+      cal.innerHTML = '<p class="hint">No pickup days are open right now. Check back soon.</p>';
+      return;
+    }
+    months.forEach((days) => {
+      const block = document.createElement('div');
+      block.className = 'month';
+      const h = document.createElement('h3');
+      h.textContent = fmt(days[0].date, { month: 'long', year: 'numeric' });
+      block.appendChild(h);
+      const head = document.createElement('div');
+      head.className = 'weekdays';
+      head.setAttribute('aria-hidden', 'true');
+      ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach((w) => {
+        const s = document.createElement('span'); s.textContent = w; head.appendChild(s);
+      });
+      block.appendChild(head);
+      const grid = document.createElement('div');
+      grid.className = 'days';
+      const lead = (asDate(days[0].date).getUTCDay() + 6) % 7;
+      for (let i = 0; i < lead; i++) {
+        const b = document.createElement('div'); b.className = 'blank'; grid.appendChild(b);
+      }
+      days.forEach((d) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'day';
+        const ok = d.open && d.remaining >= need;
+        btn.disabled = !ok;
+        btn.setAttribute('aria-pressed', String(state.date === d.date));
+        const n = document.createElement('span');
+        n.className = 'n';
+        n.textContent = asDate(d.date).getUTCDate();
+        btn.appendChild(n);
+        let label = fmt(d.date, { weekday: 'long', day: 'numeric', month: 'long' });
+        if (d.open && d.remaining > 0) {
+          const left = document.createElement('span');
+          left.className = 'left';
+          left.textContent = `${d.remaining} left`;
+          btn.appendChild(left);
+          label += ok ? `, ${d.remaining} cakes left` : `, only ${d.remaining} left`;
+        } else {
+          label += ', unavailable';
+        }
+        btn.setAttribute('aria-label', label);
+        btn.addEventListener('click', () => { state.date = d.date; render(); });
+        grid.appendChild(btn);
+      });
+      block.appendChild(grid);
+      cal.appendChild(block);
+    });
+  }
+
+  function renderSlots() {
+    const wrap = $('slots');
+    wrap.innerHTML = '';
+    $('slotHint').hidden = !!state.date;
+    if (!state.date) return;
+    for (let h = state.rules.slotsStart; h < state.rules.slotsEnd; h++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'slot';
+      b.textContent = slotText(h);
+      b.setAttribute('aria-pressed', String(state.slot === h));
+      b.addEventListener('click', () => { state.slot = h; render(); });
+      wrap.appendChild(b);
+    }
+  }
+
+  function missingStep() {
+    if (cakeCount() === 0) return 'Add at least one cake.';
+    if (!state.date) return 'Pick a pickup day.';
+    if (state.slot === null) return 'Pick a pickup time.';
+    if ($('name').value.trim().length < 2) return 'Add your name.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('email').value.trim())) return 'Add your email.';
+    if ($('phone').value.replace(/\D/g, '').length < 9) return 'Add your phone number.';
+    const nif = $('nif').value.replace(/\s/g, '');
+    if (nif && !/^\d{9}$/.test(nif)) return 'A Portuguese NIF has 9 digits.';
+    return '';
+  }
+
+  function renderSummary() {
+    const parts = state.products.filter((p) => state.items[p.code] > 0)
+      .map((p) => `${state.items[p.code]}× ${p.name}`);
+    $('sumCakes').textContent = parts.length ? parts.join(', ') : 'None yet';
+    $('sumDay').textContent = state.date ? fmt(state.date, { weekday: 'long', day: 'numeric', month: 'long' }) : 'Choose a day';
+    $('sumSlot').textContent = state.slot !== null ? slotText(state.slot) : 'Choose a time';
+    const total = euros(totalCents());
+    $('sumTotal').textContent = total;
+    const missing = missingStep();
+    $('missing').textContent = missing;
+    $('payBtn').disabled = !!missing || state.busy;
+    $('payBtn').textContent = state.busy ? 'Opening payment…' : `Pay ${total}`;
+  }
+
+  function render() {
+    if (!state.rules) return;
+    renderCakes();
+    renderCalendar();
+    renderSlots();
+    renderSummary();
+  }
+
+  function showError(msg) {
+    $('errorBox').textContent = msg;
+    $('errorBox').hidden = !msg;
+  }
+
+  ['name', 'email', 'phone', 'nif', 'notes'].forEach((id) => $(id).addEventListener('input', renderSummary));
+
+  $('payBtn').addEventListener('click', async () => {
+    if (missingStep() || state.busy) return;
+    showError('');
+    state.busy = true; renderSummary();
+    try {
+      const res = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: state.date, slot: state.slot, items: state.items,
+          name: $('name').value, email: $('email').value, phone: $('phone').value,
+          nif: $('nif').value, notes: $('notes').value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showError(data.error || 'Something went wrong. Try again.');
+        if (data.code === 'NOT_ENOUGH_CAPACITY' || data.code === 'DAY_CLOSED') {
+          state.date = null; state.slot = null;
+          await loadAvailability();
+        }
+        state.busy = false; renderSummary();
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      showError('No connection. Check your internet and try again.');
+      state.busy = false; renderSummary();
+    }
+  });
+
+  (async () => {
+    const params = new URLSearchParams(location.search);
+    const cancelled = params.get('cancelled');
+    if (cancelled) {
+      $('cancelledNotice').hidden = false;
+      history.replaceState(null, '', location.pathname);
+      await fetch('/api/cancel-checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: cancelled }),
+      }).catch(() => {});
+    }
+    try { await loadAvailability(); }
+    catch (e) {
+      $('calendar').innerHTML = '';
+      $('cakes').innerHTML = '';
+      showError(e.message || 'Could not load the order form. Reload the page.');
+    }
+  })();
+})();
+</script>
+</body>
+</html>
