@@ -1,7 +1,7 @@
 import { db, stripe, json, markPaid } from '../lib/shared.mjs';
 
 // GET /api/order-status?session_id=... -> details for the confirmation page
-export default async (req) => {
+export default async (req, context) => {
   const sessionId = new URL(req.url).searchParams.get('session_id') || '';
   if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return json({ error: 'Order not found.' }, 404);
 
@@ -15,7 +15,9 @@ export default async (req) => {
     // The webhook may not have arrived yet: ask Stripe directly
     const session = await stripe().checkout.sessions.retrieve(sessionId);
     if (session.payment_status === 'paid') {
-      await markPaid(order.id, sessionId);
+      // Reply to the customer immediately; alerts and email go out in the background
+      const work = markPaid(order.id, sessionId).catch((err) => console.error('markPaid failed', err));
+      if (context?.waitUntil) context.waitUntil(work); else await work;
       status = 'paid';
     } else if (session.status === 'complete') {
       status = 'processing'; // e.g. MB WAY still being confirmed

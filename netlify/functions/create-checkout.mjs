@@ -1,10 +1,10 @@
-import { db, stripe, json, dayLabel, slotLabel } from '../lib/shared.mjs';
+import { db, stripe, json, dayLabel, slotLabel, PICKUP_PUBLIC } from '../lib/shared.mjs';
 
 const ERRORS = {
-  NOT_ENOUGH_CAPACITY: [409, 'Someone just booked the last cakes for that day. Pick another day.'],
+  NOT_ENOUGH_CAPACITY: [409, 'Someone just booked the last cake of that size for that day. Pick another day.'],
   DAY_CLOSED: [409, 'Orders for that day have closed. Pick another day.'],
-  TOO_MANY_CAKES: [400, 'That is more cakes than one order allows.'],
-  EMPTY_ORDER: [400, 'Add at least one cake.'],
+  TOO_MANY_CAKES: [400, 'One cake per order.'],
+  EMPTY_ORDER: [400, 'Choose a size.'],
   INVALID_SLOT: [400, 'Pick a pickup time.'],
   UNKNOWN_PRODUCT: [400, 'One of the cakes is no longer available. Reload the page.'],
   INVALID_QTY: [400, 'Check the cake quantities.'],
@@ -57,7 +57,8 @@ export default async (req) => {
   // 2. Create the Stripe payment page
   try {
     const { data: products } = await supabase.from('products').select('code,name,price_cents');
-    const pickup = `Pickup ${dayLabel(date)}, ${slotLabel(slot)}, Alcântara`;
+    const pickup = `Pickup ${dayLabel(date)}, ${slotLabel(slot)}, ${PICKUP_PUBLIC}`;
+    const extra = { order_id: orderId, nif: nif || '', note: notes.slice(0, 450), phone };
     const origin = new URL(req.url).origin;
 
     const session = await stripe().checkout.sessions.create({
@@ -74,8 +75,8 @@ export default async (req) => {
         })),
       customer_email: email,
       client_reference_id: orderId,
-      metadata: { order_id: orderId },
-      payment_intent_data: { metadata: { order_id: orderId }, description: `BASCA order: ${pickup}` },
+      metadata: extra,
+      payment_intent_data: { metadata: extra, description: `La Tarta order: ${pickup}` },
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       locale: 'auto',
       custom_text: {

@@ -3,189 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order a BASCA - Basque cheesecake, Lisboa</title>
-<meta name="description" content="Order a BASCA Basque cheesecake for pickup in Alcântara, Lisboa. Choose your day and time, pay online.">
+<title>Order La Tarta - Basque cheesecake, Lisboa</title>
+<meta name="description" content="Order a La Tarta Basque cheesecake for pickup in Alcântara, Lisboa. Choose your day and time, pay online.">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --cream:#F4E9D8;
-    --cream-soft:#EADFC9;
-    --charcoal:#1C1714;
-    --caramel:#D9822B;
-    --burnt:#6E3B1F;
-    --muted:#7A6A57;
-    --maxw:1100px;
+    --amarelo:#FEEDA7; --castanho:#6E3A1F; --azul:#C4D6DF; --creme:#FFF6D4; --muted:#6F4429;
+    --page:var(--amarelo); --ink:var(--castanho); --soft:var(--muted); --rule:rgba(110,58,31,0.18);
+    --card-bg:var(--creme); --card-ink:var(--castanho); --card-soft:var(--muted); --card-line:var(--castanho);
+    --tile-bg:var(--azul); --tile-line:var(--azul); --tile-off-bg:transparent; --tile-off-ink:rgba(110,58,31,0.3);
+    --sel-bg:var(--castanho); --sel-ink:var(--amarelo);
+    --field-bg:var(--creme);
+    --sum-bg:var(--castanho); --sum-ink:var(--amarelo); --sum-soft:rgba(254,237,167,0.78); --sum-line:var(--castanho);
+    --pay-bg:var(--amarelo); --pay-ink:var(--castanho); --pay-hover:var(--azul);
+    --tile-radius:50%; --maxw:1100px;
   }
   *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--cream); color:var(--charcoal);
-    font-family:'Inter',Arial,sans-serif; font-size:16px; line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
+  body{margin:0; background:var(--page); color:var(--ink); font-family:'Inter',Arial,sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
   h1,h2,h3{font-family:'Archivo',Arial,sans-serif; margin:0; line-height:1.1;}
   a{color:inherit;}
   button{font:inherit; color:inherit;}
-  :focus-visible{outline:2px solid var(--caramel); outline-offset:3px;}
+  :focus-visible{outline:2px solid var(--castanho); outline-offset:3px;}
   [hidden]{display:none !important;}
 
-  /* header */
-  .bar{
-    background:var(--charcoal); color:var(--cream);
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px clamp(20px,4vw,48px);
-  }
-  .bar svg{width:56px; height:56px; display:block;}
-  .bar a.back{text-decoration:none; font-weight:500; font-size:0.95rem; border-bottom:1px solid var(--caramel); padding-bottom:2px;}
+  .bar{background:var(--castanho); color:var(--amarelo); display:flex; align-items:center; justify-content:space-between; padding:12px clamp(20px,4vw,48px);}
+  .brand{display:flex; align-items:center; gap:12px; text-decoration:none;}
+  .brand svg{width:46px; height:46px; display:block;}
+  .brand span{font-family:'Archivo',Arial,sans-serif; font-weight:800; font-size:1.3rem; letter-spacing:0.3px;}
+  .bar a.back{text-decoration:none; font-weight:500; font-size:0.95rem; border-bottom:1px solid var(--amarelo); padding-bottom:2px;}
 
-  .page{
-    max-width:var(--maxw); margin:0 auto;
-    padding:clamp(40px,7vw,80px) clamp(20px,4vw,48px) clamp(64px,10vw,120px);
+  .page{max-width:var(--maxw); margin:0 auto; padding:clamp(40px,7vw,80px) clamp(20px,4vw,48px) clamp(64px,10vw,120px);}
+  .photo{margin:0; width:100%; overflow:hidden; border:2px solid var(--castanho);}
+  .photo img{width:100%; height:100%; object-fit:cover; object-position:center 55%; display:block;}
+  .intro .photo{display:none; aspect-ratio:16 / 10; margin-top:24px;}
+  .side{position:sticky; top:24px;}
+  .side .photo{aspect-ratio:4 / 3; border-bottom:0;}
+  @media (max-width:860px){
+    .intro .photo{display:block;}
+    .side{position:static;}
+    .side .photo{display:none;}
   }
   .intro h1{font-weight:900; font-size:clamp(2.2rem,4vw + 1rem,3.6rem);}
-  .intro p{color:var(--muted); font-size:1.1rem; margin:14px 0 0; max-width:52ch;}
+  .intro p{color:var(--soft); font-size:1.1rem; margin:14px 0 0; max-width:52ch;}
 
-  .layout{
-    display:grid; grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
-    gap:clamp(32px,5vw,64px); margin-top:clamp(36px,5vw,56px); align-items:start;
-  }
+  .layout{display:grid; grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); gap:clamp(32px,5vw,64px); margin-top:clamp(36px,5vw,56px); align-items:start;}
   @media (max-width:860px){ .layout{grid-template-columns:1fr;} }
 
-  /* steps */
-  .step{padding-bottom:40px; margin-bottom:40px; border-bottom:2px solid var(--cream-soft);}
+  .step{padding-bottom:40px; margin-bottom:40px; border-bottom:2px solid var(--rule);}
   .step:last-child{border-bottom:0; margin-bottom:0;}
   .step-head{display:flex; align-items:baseline; gap:14px;}
-  .step-num{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:2rem; color:var(--caramel); line-height:1;}
+  .step-num{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:2rem; line-height:1; opacity:0.45;}
   .step h2{font-size:clamp(1.4rem,1vw + 1.1rem,1.8rem); font-weight:800;}
-  .hint{color:var(--muted); font-size:0.92rem; margin:10px 0 0;}
+  .hint{color:var(--soft); font-size:0.92rem; margin:10px 0 0;}
 
-  /* cakes */
-  .cakes{display:grid; gap:12px; margin-top:22px;}
-  .cake{
-    display:grid; grid-template-columns:1fr auto; align-items:center; gap:16px;
-    border:2px solid var(--burnt); padding:18px 20px;
-  }
-  .cake h3{font-size:1.15rem; font-weight:800;}
-  .cake p{margin:2px 0 0; color:var(--muted); font-size:0.95rem;}
-  .cake .price{font-family:'Archivo',Arial,sans-serif; font-weight:800; color:var(--burnt); font-size:1.15rem; margin-top:6px;}
-  .stepper{display:flex; align-items:center; border:2px solid var(--charcoal);}
-  .stepper button{
-    width:44px; height:44px; border:0; background:none; cursor:pointer;
-    font-family:'Archivo',Arial,sans-serif; font-weight:800; font-size:1.3rem;
-  }
-  .stepper button:hover:not(:disabled){background:var(--cream-soft);}
-  .stepper button:disabled{color:var(--muted); opacity:0.4; cursor:not-allowed;}
-  .stepper output{
-    min-width:36px; text-align:center; font-family:'Archivo',Arial,sans-serif;
-    font-weight:900; font-size:1.25rem;
-  }
+  .cakes{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px;}
+  @media (max-width:560px){ .cakes{grid-template-columns:1fr;} }
+  .cake{position:relative; text-align:left; cursor:pointer; font:inherit; background:var(--card-bg); color:var(--card-ink); border:2px solid var(--card-line); padding:22px 22px 20px; display:flex; flex-direction:column; gap:14px;}
+  .cake h3{font-size:1.25rem; font-weight:800; padding-right:44px;}
+  .cake:hover{box-shadow:inset 0 0 0 1px var(--castanho);}
+  .cake .mark{position:absolute; top:18px; right:18px; width:30px; height:30px;}
+  .cake .mark circle{fill:none; stroke:var(--castanho); stroke-width:70;}
+  .cake .mark path{fill:transparent;}
+  .cake[aria-checked="true"]{background:var(--castanho); color:var(--amarelo);}
+  .cake[aria-checked="true"] p{color:rgba(254,237,167,0.8);}
+  .cake[aria-checked="true"] .mark circle{fill:var(--amarelo); stroke:var(--amarelo);}
+  .cake[aria-checked="true"] .mark path{fill:var(--castanho);}
+  .cake p{margin:2px 0 0; color:var(--card-soft); font-size:0.95rem;}
+  .cake-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:auto;}
+  .cake .price{font-family:'Archivo',Arial,sans-serif; font-weight:800; font-size:1.5rem;}
 
-  /* calendar */
   .month{margin-top:26px;}
   .month h3{font-size:1rem; font-weight:700; margin-bottom:10px;}
   .weekdays, .days{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px;}
-  .weekdays span{font-size:0.8rem; color:var(--muted); text-align:center; padding-bottom:4px;}
-  .day{
-    aspect-ratio:1 / 1; min-height:48px;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    border:2px solid var(--burnt); background:var(--cream); cursor:pointer; padding:2px;
-  }
-  .day .n{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:clamp(1.05rem,1.6vw + 0.5rem,1.6rem); line-height:1;}
-  .day .left{font-size:0.7rem; color:var(--muted); margin-top:4px; line-height:1;}
-  .day:hover:not(:disabled){border-color:var(--charcoal);}
-  .day[aria-pressed="true"]{background:var(--charcoal); border-color:var(--charcoal); color:var(--cream);}
-  .day[aria-pressed="true"] .left{color:var(--cream-soft);}
-  .day:disabled{border-color:transparent; background:var(--cream-soft); color:var(--muted); cursor:not-allowed;}
-  .day:disabled .n{font-weight:700; opacity:0.55;}
+  .weekdays span{font-size:0.8rem; color:var(--soft); text-align:center; padding-bottom:4px;}
+  .day{aspect-ratio:1 / 1; min-height:44px; display:flex; align-items:center; justify-content:center; border:2px solid var(--tile-line); background:var(--tile-bg); color:var(--castanho); border-radius:var(--tile-radius); cursor:pointer; padding:0;}
+  .day span{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:clamp(1.05rem,1.6vw + 0.5rem,1.55rem); line-height:1;}
+  .day:hover:not(:disabled){border-color:var(--castanho);}
+  .day[aria-pressed="true"]{background:var(--sel-bg); border-color:var(--sel-bg); color:var(--sel-ink);}
+  .day:disabled{border-color:transparent; background:var(--tile-off-bg); color:var(--tile-off-ink); cursor:not-allowed;}
+  .day:disabled span{font-weight:700;}
   .blank{aspect-ratio:1 / 1;}
-  @media (max-width:420px){ .day .left{display:none;} }
 
-  /* slots */
   .slots{display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; margin-top:22px;}
-  .slot{
-    border:2px solid var(--burnt); background:var(--cream); padding:12px 8px; cursor:pointer;
-    font-family:'Archivo',Arial,sans-serif; font-weight:700; font-size:1rem;
-  }
-  .slot:hover{border-color:var(--charcoal);}
-  .slot[aria-pressed="true"]{background:var(--charcoal); border-color:var(--charcoal); color:var(--cream);}
+  .slot{border:2px solid var(--tile-line); background:var(--tile-bg); color:var(--castanho); padding:12px 8px; cursor:pointer; font-family:'Archivo',Arial,sans-serif; font-weight:700; font-size:1rem;}
+  .slot{border-radius:999px;}
+  .slot:hover{border-color:var(--castanho);}
+  .slot[aria-pressed="true"]{background:var(--sel-bg); border-color:var(--sel-bg); color:var(--sel-ink);}
 
-  /* details */
   .fields{display:grid; grid-template-columns:1fr 1fr; gap:18px 16px; margin-top:22px;}
   .field{display:flex; flex-direction:column; gap:6px;}
   .field.wide{grid-column:1 / -1;}
   .field label{font-weight:600; font-size:0.95rem;}
-  .field label span{font-weight:400; color:var(--muted);}
-  .field input, .field textarea{
-    font:inherit; color:var(--charcoal); background:var(--cream);
-    border:2px solid var(--burnt); border-radius:0; padding:11px 12px; width:100%;
-  }
+  .field label span{font-weight:400; color:var(--soft);}
+  .field input, .field textarea{font:inherit; color:var(--castanho); background:var(--field-bg); border:2px solid var(--castanho); border-radius:0; padding:11px 12px; width:100%;}
   .field textarea{min-height:84px; resize:vertical;}
-  .field input:focus, .field textarea:focus{outline:none; border-color:var(--charcoal);}
+  .field input:focus, .field textarea:focus{outline:none; box-shadow:0 0 0 3px rgba(110,58,31,0.25);}
   @media (max-width:560px){ .fields{grid-template-columns:1fr;} }
 
-  /* summary */
-  .summary{
-    position:sticky; top:24px;
-    background:var(--cream-soft); border:2px solid var(--charcoal); padding:26px 24px;
-  }
-  @media (max-width:860px){ .summary{position:static;} }
-  .summary h2{font-size:1.3rem; font-weight:800;}
+  .summary{background:var(--sum-bg); color:var(--sum-ink); border:2px solid var(--sum-line); padding:26px 24px;}
+    .summary h2{font-size:1.3rem; font-weight:800;}
   .summary dl{margin:18px 0 0; display:grid; grid-template-columns:auto 1fr; gap:8px 16px;}
-  .summary dt{color:var(--muted); font-size:0.92rem;}
+  .summary dt{color:var(--sum-soft); font-size:0.92rem;}
   .summary dd{margin:0; text-align:right; font-weight:500;}
-  .total{
-    display:flex; justify-content:space-between; align-items:baseline;
-    border-top:2px solid var(--charcoal); margin-top:20px; padding-top:16px;
-  }
+  .total{display:flex; justify-content:space-between; align-items:baseline; border-top:2px solid currentColor; margin-top:20px; padding-top:16px;}
   .total span{font-weight:600;}
-  .total strong{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:2.1rem; color:var(--burnt);}
-  .pay{
-    width:100%; margin-top:20px; padding:16px; border:0; cursor:pointer;
-    background:var(--charcoal); color:var(--cream);
-    font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:1.25rem;
-  }
-  .pay:hover:not(:disabled){background:var(--burnt);}
-  .pay:disabled{background:var(--muted); cursor:not-allowed;}
-  .missing{font-size:0.9rem; color:var(--muted); margin:10px 0 0; text-align:center;}
-  .small{font-size:0.85rem; color:var(--muted); margin:16px 0 0;}
+  .total strong{font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:2.1rem;}
+  .pay{width:100%; margin-top:20px; padding:16px; border:0; cursor:pointer; background:var(--pay-bg); color:var(--pay-ink); font-family:'Archivo',Arial,sans-serif; font-weight:900; font-size:1.25rem;}
+  .pay:hover:not(:disabled){background:var(--pay-hover);}
+  .pay:disabled{opacity:0.45; cursor:not-allowed;}
+  .missing{font-size:0.9rem; color:var(--sum-soft); margin:10px 0 0; text-align:center;}
+  .small{font-size:0.85rem; color:var(--sum-soft); margin:16px 0 0;}
 
-  .notice{border-left:3px solid var(--caramel); padding:10px 0 10px 18px; margin-top:24px;}
-  .notice.error{border-color:#A3321A; color:#7C2410; font-weight:500;}
-  .loading{color:var(--muted); margin-top:22px;}
+  .notice{border-left:3px solid var(--castanho); padding:10px 0 10px 18px; margin-top:24px;}
+  .notice.error{border-color:#A3321A; color:#8A2A12; font-weight:500;}
+  .summary .notice.error{color:var(--amarelo); border-color:var(--amarelo);}
+  .loading{color:var(--soft); margin-top:22px;}
 </style>
 </head>
 <body>
 <header class="bar">
-  <a href="/" aria-label="BASCA home">
-    <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <circle cx="150" cy="150" r="145" fill="#1C1714" stroke="#F4E9D8" stroke-width="6"/>
-      <text x="150" y="146" text-anchor="middle" font-family="Archivo, Arial, sans-serif" font-weight="800" font-size="46" letter-spacing="2" fill="#F4E9D8">BASCA</text>
-      <path d="M90,175 L110,168 L122,178 L138,165 L154,179 L170,169 L190,175" stroke="#D9822B" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="150" cy="235" r="15" fill="#D9822B"/>
-    </svg>
+  <a href="/" class="brand" aria-label="La Tarta home">
+    <svg viewBox="0 0 1096 1096" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="548" cy="548" r="540" fill="#FEEDA7"/><path d="M551 387 L425 684 Q548 736 672 686 Z" fill="#6E3A1F"/></svg>
+    <span>La Tarta</span>
   </a>
   <a class="back" href="/">Back to the site</a>
 </header>
 
 <main class="page">
   <div class="intro">
-    <h1>Order a BASCA</h1>
-    <p id="rulesLine">Pickup in Alcântara, Wednesday to Sunday. Order by 18:00 two days before.</p>
-    <p class="notice" id="cancelledNotice" hidden>Payment cancelled. Your cakes are no longer held, so pick again whenever you're ready.</p>
+    <div>
+    <h1>Order La Tarta</h1>
+    <p id="rulesLine">Pickup at Rua das Fontainhas, Alcântara, Wednesday to Sunday. Order by 18:00, two days before pickup.</p>
+    <p class="notice" id="cancelledNotice" hidden>Payment cancelled. Your cake is no longer held, so pick again whenever you're ready.</p>
+    </div>
+    <figure class="photo"><img src="cheesecake-hero.jpeg" alt="A slice of La Tarta Basque cheesecake with a dark burnt top on a pale blue plate"></figure>
   </div>
 
   <div class="layout">
     <div>
       <section class="step" aria-labelledby="h-cakes">
-        <div class="step-head"><span class="step-num">1</span><h2 id="h-cakes">Your cakes</h2></div>
-        <div class="cakes" id="cakes"><p class="loading">Loading…</p></div>
-        <p class="hint" id="maxHint"></p>
+        <div class="step-head"><span class="step-num">1</span><h2 id="h-cakes">Choose your size</h2></div>
+        <p class="hint">One cake per order.</p>
+        <div class="cakes" id="cakes" role="radiogroup" aria-labelledby="h-cakes"><p class="loading">Loading…</p></div>
       </section>
 
       <section class="step" aria-labelledby="h-day">
         <div class="step-head"><span class="step-num">2</span><h2 id="h-day">Pickup day</h2></div>
+        <p class="hint" id="dayHint">Choose a size first.</p>
         <div id="calendar"><p class="loading">Loading available days…</p></div>
       </section>
 
@@ -207,35 +175,42 @@
       </section>
     </div>
 
+    <div class="side">
+    <figure class="photo"><img src="cheesecake-hero.jpeg" alt="" ></figure>
     <aside class="summary" aria-labelledby="h-summary">
       <h2 id="h-summary">Your order</h2>
       <dl>
-        <dt>Cakes</dt><dd id="sumCakes">None yet</dd>
+        <dt>Cake</dt><dd id="sumCakes">Choose a size</dd>
         <dt>Pickup</dt><dd id="sumDay">Choose a day</dd>
         <dt>Time</dt><dd id="sumSlot">Choose a time</dd>
-        <dt>Where</dt><dd>Alcântara, Lisboa</dd>
+        <dt>Where</dt><dd>Rua das Fontainhas, Alcântara</dd>
       </dl>
       <div class="total"><span>Total</span><strong id="sumTotal">€0</strong></div>
       <button class="pay" id="payBtn" disabled>Pay</button>
       <p class="missing" id="missing"></p>
       <div class="notice error" id="errorBox" role="alert" hidden></div>
-      <p class="small">Card, Apple Pay, Google Pay or MB WAY, through Stripe. The exact pickup address is shown once you've paid.</p>
+      <p class="small">Pay securely through Stripe. Pickup at Rua das Fontainhas, Alcântara.</p>
     </aside>
+    </div>
   </div>
 </main>
 
 <script>
 (() => {
-  const state = { rules: null, products: [], days: [], items: {}, date: null, slot: null, busy: false };
+  const state = { rules: null, products: [], days: [], size: null, date: null, slot: null, busy: false };
   const $ = (id) => document.getElementById(id);
 
   const euros = (c) => '€' + (c / 100).toFixed(2).replace('.00', '');
   const asDate = (iso) => new Date(iso + 'T00:00:00Z');
   const fmt = (iso, opts) => new Intl.DateTimeFormat('en-GB', { ...opts, timeZone: 'UTC' }).format(asDate(iso));
   const slotText = (h) => `${String(h).padStart(2, '0')}:00–${String(h + 1).padStart(2, '0')}:00`;
-  const cakeCount = () => Object.values(state.items).reduce((a, b) => a + b, 0);
-  const totalCents = () => state.products.reduce((t, p) => t + (state.items[p.code] || 0) * p.price_cents, 0);
+  const product = () => state.products.find((p) => p.code === state.size);
+  const totalCents = () => (product() ? product().price_cents : 0);
+  const items = () => Object.fromEntries(state.products.map((p) => [p.code, p.code === state.size ? 1 : 0]));
   const dayInfo = (iso) => state.days.find((d) => d.date === iso);
+
+  // A day is available if it is open and still has the chosen size
+  const fits = (d) => !!(d && d.open && state.size && (d.remaining[state.size] || 0) >= 1);
 
   async function loadAvailability() {
     const res = await fetch('/api/availability', { cache: 'no-store' });
@@ -244,67 +219,54 @@
     state.rules = data.rules;
     state.products = data.products;
     state.days = data.days;
-    if (!Object.keys(state.items).length) {
-      data.products.forEach((p, i) => (state.items[p.code] = i === 0 ? 1 : 0));
-    }
     const r = data.rules;
     $('rulesLine').textContent =
-      `Pickup in Alcântara. Order by ${String(r.cutoffHour).padStart(2, '0')}:00, ${r.leadDays} days before pickup.`;
-    $('maxHint').textContent = `Up to ${r.maxCakes} cakes per order.`;
-    if (state.date && !(dayInfo(state.date)?.open && dayInfo(state.date).remaining >= cakeCount())) {
-      state.date = null; state.slot = null;
-    }
+      `Pickup at Rua das Fontainhas, Alcântara, Wednesday to Sunday. Order by ${String(r.cutoffHour).padStart(2, '0')}:00, ${r.leadDays === 2 ? 'two' : r.leadDays} days before pickup.`;
+    if (state.date && !fits(dayInfo(state.date))) { state.date = null; state.slot = null; }
     render();
   }
 
   function renderCakes() {
-    const max = state.rules.maxCakes;
     const wrap = $('cakes');
     wrap.innerHTML = '';
     state.products.forEach((p) => {
-      const q = state.items[p.code] || 0;
-      const row = document.createElement('div');
-      row.className = 'cake';
-      row.innerHTML = `
-        <div><h3></h3><p></p><div class="price"></div></div>
-        <div class="stepper">
-          <button type="button" data-d="-1">−</button>
-          <output aria-live="polite"></output>
-          <button type="button" data-d="1">+</button>
-        </div>`;
-      row.querySelector('h3').textContent = p.name;
-      row.querySelector('p').textContent = p.description || '';
-      row.querySelector('.price').textContent = euros(p.price_cents);
-      row.querySelector('output').textContent = q;
-      const [minus, plus] = row.querySelectorAll('button');
-      minus.setAttribute('aria-label', `One fewer ${p.name}`);
-      plus.setAttribute('aria-label', `One more ${p.name}`);
-      minus.disabled = q === 0;
-      plus.disabled = cakeCount() >= max;
-      row.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
-        state.items[p.code] = Math.max(0, q + Number(b.dataset.d));
-        const info = state.date && dayInfo(state.date);
-        if (info && info.remaining < cakeCount()) { state.date = null; state.slot = null; }
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'cake';
+      card.setAttribute('role', 'radio');
+      card.setAttribute('aria-checked', String(state.size === p.code));
+      card.innerHTML = `
+        <svg class="mark" viewBox="0 0 1096 1096" aria-hidden="true"><circle cx="548" cy="548" r="500"/><path d="M551 387 L425 684 Q548 736 672 686 Z"/></svg>
+        <div><h3></h3><p></p></div>
+        <div class="cake-foot"><div class="price"></div></div>`;
+      card.querySelector('h3').textContent = p.name;
+      card.querySelector('p').textContent = p.description || '';
+      card.querySelector('.price').textContent = euros(p.price_cents);
+      card.addEventListener('click', () => {
+        state.size = p.code;
+        if (state.date && !fits(dayInfo(state.date))) { state.date = null; state.slot = null; }
         render();
-      }));
-      wrap.appendChild(row);
+      });
+      wrap.appendChild(card);
     });
   }
 
   function renderCalendar() {
-    const need = Math.max(cakeCount(), 1);
+    $('dayHint').textContent = state.size
+      ? `Days shown in blue have a Size ${state.size} available.`
+      : 'Choose a size first.';
     const cal = $('calendar');
     cal.innerHTML = '';
+    if (!state.days.some((d) => d.open)) {
+      cal.innerHTML = '<p class="hint">No pickup days are open right now. Check back soon.</p>';
+      return;
+    }
     const months = new Map();
     state.days.forEach((d) => {
       const key = d.date.slice(0, 7);
       if (!months.has(key)) months.set(key, []);
       months.get(key).push(d);
     });
-    if (!state.days.some((d) => d.open)) {
-      cal.innerHTML = '<p class="hint">No pickup days are open right now. Check back soon.</p>';
-      return;
-    }
     months.forEach((days) => {
       const block = document.createElement('div');
       block.className = 'month';
@@ -328,24 +290,11 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'day';
-        const ok = d.open && d.remaining >= need;
+        const ok = fits(d);
         btn.disabled = !ok;
         btn.setAttribute('aria-pressed', String(state.date === d.date));
-        const n = document.createElement('span');
-        n.className = 'n';
-        n.textContent = asDate(d.date).getUTCDate();
-        btn.appendChild(n);
-        let label = fmt(d.date, { weekday: 'long', day: 'numeric', month: 'long' });
-        if (d.open && d.remaining > 0) {
-          const left = document.createElement('span');
-          left.className = 'left';
-          left.textContent = `${d.remaining} left`;
-          btn.appendChild(left);
-          label += ok ? `, ${d.remaining} cakes left` : `, only ${d.remaining} left`;
-        } else {
-          label += ', unavailable';
-        }
-        btn.setAttribute('aria-label', label);
+        btn.innerHTML = `<span>${asDate(d.date).getUTCDate()}</span>`;
+        btn.setAttribute('aria-label', fmt(d.date, { weekday: 'long', day: 'numeric', month: 'long' }) + (ok ? '' : ', unavailable'));
         btn.addEventListener('click', () => { state.date = d.date; render(); });
         grid.appendChild(btn);
       });
@@ -371,7 +320,7 @@
   }
 
   function missingStep() {
-    if (cakeCount() === 0) return 'Add at least one cake.';
+    if (!state.size) return 'Choose a size.';
     if (!state.date) return 'Pick a pickup day.';
     if (state.slot === null) return 'Pick a pickup time.';
     if ($('name').value.trim().length < 2) return 'Add your name.';
@@ -383,9 +332,7 @@
   }
 
   function renderSummary() {
-    const parts = state.products.filter((p) => state.items[p.code] > 0)
-      .map((p) => `${state.items[p.code]}× ${p.name}`);
-    $('sumCakes').textContent = parts.length ? parts.join(', ') : 'None yet';
+    $('sumCakes').textContent = product() ? product().name : 'Choose a size';
     $('sumDay').textContent = state.date ? fmt(state.date, { weekday: 'long', day: 'numeric', month: 'long' }) : 'Choose a day';
     $('sumSlot').textContent = state.slot !== null ? slotText(state.slot) : 'Choose a time';
     const total = euros(totalCents());
@@ -398,16 +345,10 @@
 
   function render() {
     if (!state.rules) return;
-    renderCakes();
-    renderCalendar();
-    renderSlots();
-    renderSummary();
+    renderCakes(); renderCalendar(); renderSlots(); renderSummary();
   }
 
-  function showError(msg) {
-    $('errorBox').textContent = msg;
-    $('errorBox').hidden = !msg;
-  }
+  function showError(msg) { $('errorBox').textContent = msg; $('errorBox').hidden = !msg; }
 
   ['name', 'email', 'phone', 'nif', 'notes'].forEach((id) => $(id).addEventListener('input', renderSummary));
 
@@ -417,10 +358,9 @@
     state.busy = true; renderSummary();
     try {
       const res = await fetch('/api/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          date: state.date, slot: state.slot, items: state.items,
+          date: state.date, slot: state.slot, items: items(),
           name: $('name').value, email: $('email').value, phone: $('phone').value,
           nif: $('nif').value, notes: $('notes').value,
         }),
@@ -455,8 +395,7 @@
     }
     try { await loadAvailability(); }
     catch (e) {
-      $('calendar').innerHTML = '';
-      $('cakes').innerHTML = '';
+      $('calendar').innerHTML = ''; $('cakes').innerHTML = '';
       showError(e.message || 'Could not load the order form. Reload the page.');
     }
   })();

@@ -51,10 +51,13 @@ export const addDays = (isoDay, n) => {
   return d.toISOString().slice(0, 10);
 };
 
+export const PICKUP_PUBLIC = 'Rua das Fontainhas, Alcântara';
+
 export const euros = (cents) => `€${(cents / 100).toFixed(2).replace('.00', '')}`;
 
 export const itemsLabel = (items) =>
-  Object.entries(items).filter(([, q]) => q > 0).map(([code, q]) => `${q}× ${code}`).join(', ');
+  Object.entries(items).filter(([, q]) => q > 0)
+    .map(([code, q]) => (q === 1 ? `Size ${code}` : `${q}× Size ${code}`)).join(', ');
 
 // ---- Telegram ----
 export const telegram = async (text) => {
@@ -88,10 +91,10 @@ export const markPaid = async (orderId, sessionId) => {
   if (!data) return null; // already paid, nothing to do
 
   const { data: status } = await supabase.rpc('day_status', { p_day: data.pickup_date });
-  const day = status?.[0];
-  const over = day && day.taken > day.capacity;
+  const booked = (status || []).map((r) => `${r.code} ${r.taken}/${r.capacity}`).join(', ');
+  const over = (status || []).some((r) => r.taken > r.capacity);
 
-  await telegram(
+  const alert = telegram(
     [
       `New order: ${dayLabel(data.pickup_date)}, ${slotLabel(data.slot_hour)}`,
       `${itemsLabel(data.items)} · ${euros(data.total_cents)}`,
@@ -102,17 +105,16 @@ export const markPaid = async (orderId, sessionId) => {
       data.nif ? `NIF ${data.nif}` : null,
       data.notes ? `Note: ${data.notes}` : null,
       '',
-      day ? `Day booked: ${day.taken} of ${day.capacity} cakes` : null,
+      booked ? `Day booked: ${booked}` : null,
       over ? 'WARNING: this day is now over capacity (payment arrived after the hold ran out).' : null,
     ].filter((line) => line !== null).join('\n'),
   );
 
-  try {
-    await sendConfirmationEmail(data);
-  } catch (err) {
+  const email = sendConfirmationEmail(data).catch(async (err) => {
     console.error('Confirmation email failed', err);
     await telegram(`Confirmation email to ${data.email} failed: ${err.message}`);
-  }
+  });
+  await Promise.allSettled([alert, email]);
   return data;
 };
 
@@ -128,7 +130,7 @@ export const sendConfirmationEmail = async (order) => {
     return;
   }
   const brand = optionalEnv('BRAND_NAME', 'La Tarta');
-  const address = optionalEnv('PICKUP_ADDRESS', 'Alcântara, Lisboa');
+  const address = optionalEnv('PICKUP_ADDRESS', `${PICKUP_PUBLIC}, Lisboa`);
   const when = `${dayLabel(order.pickup_date)}, ${slotLabel(order.slot_hour)}`;
   const firstName = order.customer_name.split(' ')[0];
   const cakes = itemsLabel(order.items);
@@ -141,7 +143,7 @@ export const sendConfirmationEmail = async (order) => {
     '',
     `Pickup: ${when}`,
     `Address: ${address}`,
-    `Cakes: ${cakes}`,
+    `Cake: ${cakes}`,
     `Paid: ${total}`,
     order.notes ? `Your note: ${order.notes}` : null,
     '',
@@ -151,25 +153,32 @@ export const sendConfirmationEmail = async (order) => {
   ].filter((line) => line !== null).join('\n');
 
   const row = (label, value) =>
-    `<tr><td style="padding:6px 16px 6px 0;color:#7A6A57;vertical-align:top">${label}</td>` +
-    `<td style="padding:6px 0;color:#1C1714;font-weight:600">${escapeHtml(value)}</td></tr>`;
+    `<tr><td style="padding:7px 18px 7px 0;color:#6F4429;vertical-align:top;font-size:15px">${label}</td>` +
+    `<td style="padding:7px 0;color:#6E3A1F;font-weight:700;font-size:15px">${escapeHtml(value)}</td></tr>`;
 
   const html = `
-  <div style="background:#F4E9D8;padding:32px 16px;font-family:Arial,Helvetica,sans-serif">
-    <div style="max-width:520px;margin:0 auto;background:#F4E9D8">
-      <p style="font-size:22px;font-weight:800;color:#1C1714;margin:0 0 20px">${escapeHtml(brand)}</p>
-      <p style="font-size:16px;color:#1C1714;margin:0 0 8px">Hi ${escapeHtml(firstName)},</p>
-      <p style="font-size:16px;color:#1C1714;margin:0 0 24px">Your order is confirmed.</p>
-      <div style="border:2px solid #1C1714;background:#EADFC9;padding:20px">
-        <p style="font-size:20px;font-weight:800;color:#6E3B1F;margin:0 0 12px">${escapeHtml(when)}</p>
-        <table style="border-collapse:collapse;font-size:15px">
+  <div style="background:#FEEDA7;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;color:#6E3A1F">
+    <div style="max-width:520px;margin:0 auto">
+      <table style="border-collapse:collapse;margin:0 0 28px"><tr>
+        <td style="width:44px;height:44px;border-radius:22px;background:#6E3A1F;text-align:center;vertical-align:middle">
+          <span style="display:inline-block;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #FEEDA7"></span>
+        </td>
+        <td style="padding-left:12px;font-size:22px;font-weight:800;color:#6E3A1F">${escapeHtml(brand)}</td>
+      </tr></table>
+      <p style="font-size:26px;font-weight:800;margin:0 0 10px;line-height:1.2">Thank you, ${escapeHtml(firstName)}. Your order is booked.</p>
+      <p style="font-size:16px;color:#6F4429;margin:0 0 24px">Here are your pickup details.</p>
+      <div style="background:#6E3A1F;color:#FEEDA7;padding:22px 22px 18px">
+        <p style="font-size:20px;font-weight:800;margin:0;color:#FEEDA7">${escapeHtml(dayLabel(order.pickup_date))}<br>${escapeHtml(slotLabel(order.slot_hour))}</p>
+      </div>
+      <div style="background:#FFF6D4;border:2px solid #6E3A1F;border-top:0;padding:16px 22px">
+        <table style="border-collapse:collapse">
           ${row('Pickup at', address)}
-          ${row('Cakes', cakes)}
+          ${row('Cake', cakes)}
           ${row('Paid', total)}
           ${order.notes ? row('Your note', order.notes) : ''}
         </table>
       </div>
-      <p style="font-size:15px;color:#7A6A57;margin:24px 0 0">Need to change something? Just reply to this email.</p>
+      <p style="font-size:15px;color:#6F4429;margin:24px 0 0">Need to change something? Just reply to this email.</p>
     </div>
   </div>`;
 
@@ -185,4 +194,15 @@ export const sendConfirmationEmail = async (order) => {
     text,
     html,
   });
+};
+
+
+// ---- Plain email to yourself (daily summary) ----
+export const emailOwner = async (subject, text) => {
+  const user = optionalEnv('GMAIL_USER');
+  const pass = optionalEnv('GMAIL_APP_PASSWORD').replace(/\s/g, '');
+  if (!user || !pass) return;
+  const nodemailer = (await import('nodemailer')).default;
+  const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
+  await transporter.sendMail({ from: `"${optionalEnv('BRAND_NAME', 'La Tarta')} orders" <${user}>`, to: user, subject, text });
 };

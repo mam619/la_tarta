@@ -16,7 +16,6 @@ export default async () => {
   const s = settings.data;
   return json({
     rules: {
-      maxCakes: s.max_cakes_per_order,
       slotsStart: s.slots_start_hour,
       slotsEnd: s.slots_end_hour,
       cutoffHour: s.cutoff_hour,

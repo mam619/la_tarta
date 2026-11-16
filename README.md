@@ -1,8 +1,17 @@
-# BASCA ordering system: setup guide
+# La Tarta ordering system: setup guide
 
-Pickup-only ordering for bascalisboa.com: 4 cakes a day (Wednesday to Sunday),
-1-hour pickup slots 12:00–20:00, orders close at 18:00 two days before pickup,
-payment by Stripe, Telegram alerts.
+Pickup-only ordering: one cake per order, 2 Size S + 2 Size L a day (Wednesday to Sunday),
+1-hour pickup slots 12:00–20:00 at Rua das Fontainhas, orders close at 18:00 two days before pickup,
+payment by Stripe, Telegram alerts, confirmation and daily summary emails from Gmail.
+
+## Update: November 2026 (La Tarta design, sizes, emails)
+
+1. **Supabase → SQL Editor:** paste and run `supabase/migration-2-per-size.sql` once.
+   Existing orders are kept.
+2. **Netlify → Environment variables:** set `PICKUP_ADDRESS` to the full address customers see
+   after paying (e.g. `Rua das Fontainhas 12, Alcântara, Lisboa. Ring the bell for La Tarta`).
+   Make sure `GMAIL_USER`, `GMAIL_APP_PASSWORD` and `BRAND_NAME=La Tarta` are set.
+3. **GitHub:** upload all files from this folder (they replace the old ones), then let Netlify deploy.
 
 ## What's in here
 
@@ -88,8 +97,8 @@ Stripe doesn't email receipts in test mode. In live mode, turn on
 
 | To do this | Edit this table |
 |---|---|
-| Change the usual cakes per weekday | `weekly_capacity` |
-| Close a day, or change one date's capacity | `date_overrides`: add a row with the date and cakes (0 = closed) |
+| Change the usual cakes per weekday | `weekly_capacity`: `size_s` and `size_l` columns |
+| Close a day, or change one date's capacity | `date_overrides`: add a row with the date, `size_s` and `size_l` (both 0 = closed) |
 | Change prices | `products` (in cents: 2400 = €24) |
 | Change slot hours, cutoff, max cakes per order | `settings` |
 | See orders | `orders` |
@@ -97,8 +106,11 @@ Stripe doesn't email receipts in test mode. In live mode, turn on
 **Refunds:** refund in Stripe (open the payment → Refund), then set the order's `status` to
 `refunded` in Supabase so the cakes go back into that day's capacity.
 
-**18:00 summary:** each day at the cutoff time (Lisbon time), Telegram sends the production list
-for the day whose orders just closed.
+**18:00 summary:** each day at the cutoff time (Lisbon time), Telegram and your Gmail receive the
+production list for the day whose orders just closed: sizes to bake, each order's slot, name, phone,
+email, NIF and note.
+
+**Stripe:** each payment carries the order's NIF, note and phone in its details (handy for invoicing).
 
 ## Going live
 

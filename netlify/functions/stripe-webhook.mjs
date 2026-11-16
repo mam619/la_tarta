@@ -1,7 +1,7 @@
 import { db, stripe, json, markPaid } from '../lib/shared.mjs';
 
 // POST /api/stripe-webhook -> Stripe tells us when a payment succeeds, fails or times out
-export default async (req) => {
+export default async (req, context) => {
   const signature = req.headers.get('stripe-signature');
   const payload = await req.text();
   let event;
@@ -16,11 +16,15 @@ export default async (req) => {
   const orderId = session.metadata?.order_id;
   if (!orderId) return json({ received: true });
   const supabase = db();
+  const background = (promise) => {
+    const work = promise.catch((err) => console.error('Webhook task failed', err));
+    if (context?.waitUntil) context.waitUntil(work); else return work;
+  };
 
   switch (event.type) {
     case 'checkout.session.completed':
       if (session.payment_status === 'paid') {
-        await markPaid(orderId, session.id);
+        await background(markPaid(orderId, session.id));
       } else {
         // Payment still being confirmed (e.g. MB WAY): keep the cakes held for a day
         await supabase.from('orders')
@@ -29,7 +33,7 @@ export default async (req) => {
       }
       break;
     case 'checkout.session.async_payment_succeeded':
-      await markPaid(orderId, session.id);
+      await background(markPaid(orderId, session.id));
       break;
     case 'checkout.session.async_payment_failed':
     case 'checkout.session.expired':
