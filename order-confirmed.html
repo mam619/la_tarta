@@ -72,7 +72,7 @@
       if (!res.ok) throw new Error(o.error);
       if (o.status === 'paid') {
         $('title').textContent = `Thank you, ${o.name}. Your BASCA is booked.`;
-        $('lead').textContent = 'Stripe has emailed you a receipt. See you at pickup.';
+        $('lead').textContent = 'We've emailed you the details. See you at pickup.';
         $('when').textContent = `${fmt(o.date)}, ${slot(o.slot)}`;
         $('cakes').textContent = Object.entries(o.items).filter(([, q]) => q > 0).map(([c, q]) => `${q}× ${c}`).join(', ');
         $('total').textContent = euros(o.total);
