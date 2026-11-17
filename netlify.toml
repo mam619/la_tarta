@@ -4,6 +4,31 @@
 [functions]
   node_bundler = "esbuild"
 
+# Old domain: send every page to the same page on latartalisboa.com (permanent redirect)
+[[redirects]]
+  from = "https://bascalisboa.com/*"
+  to = "https://latartalisboa.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.bascalisboa.com/*"
+  to = "https://latartalisboa.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://bascalisboa.com/*"
+  to = "https://latartalisboa.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.bascalisboa.com/*"
+  to = "https://latartalisboa.com/:splat"
+  status = 301
+  force = true
+
 # Keep the backend files out of the public site
 [[redirects]]
   from = "/netlify/*"
