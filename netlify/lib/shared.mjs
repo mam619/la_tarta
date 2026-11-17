@@ -152,35 +152,42 @@ export const sendConfirmationEmail = async (order) => {
     brand,
   ].filter((line) => line !== null).join('\n');
 
+  const site = optionalEnv('SITE_URL', 'https://latartalisboa.com');
+  const brown = '#6E3A1F';
+  const soft = '#8A5A3C';
   const row = (label, value) =>
-    `<tr><td style="padding:7px 18px 7px 0;color:#6F4429;vertical-align:top;font-size:15px">${label}</td>` +
-    `<td style="padding:7px 0;color:#6E3A1F;font-weight:700;font-size:15px">${escapeHtml(value)}</td></tr>`;
+    `<tr><td style="padding:10px 16px 10px 0;color:${soft};vertical-align:top;font-size:15px;border-top:1px solid #E8DCCB;white-space:nowrap">${label}</td>` +
+    `<td style="padding:10px 0;color:${brown};font-weight:700;font-size:15px;border-top:1px solid #E8DCCB">${escapeHtml(value)}</td></tr>`;
 
-  const html = `
-  <div style="background:#FEEDA7;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;color:#6E3A1F">
-    <div style="max-width:520px;margin:0 auto">
-      <table style="border-collapse:collapse;margin:0 0 28px"><tr>
-        <td style="width:44px;height:44px;border-radius:22px;background:#6E3A1F;text-align:center;vertical-align:middle">
-          <span style="display:inline-block;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:16px solid #FEEDA7"></span>
-        </td>
-        <td style="padding-left:12px;font-size:22px;font-weight:800;color:#6E3A1F">${escapeHtml(brand)}</td>
-      </tr></table>
-      <p style="font-size:26px;font-weight:800;margin:0 0 10px;line-height:1.2">Thank you, ${escapeHtml(firstName)}. Your order is booked.</p>
-      <p style="font-size:16px;color:#6F4429;margin:0 0 24px">Here are your pickup details.</p>
-      <div style="background:#6E3A1F;color:#FEEDA7;padding:22px 22px 18px">
-        <p style="font-size:20px;font-weight:800;margin:0;color:#FEEDA7">${escapeHtml(dayLabel(order.pickup_date))}<br>${escapeHtml(slotLabel(order.slot_hour))}</p>
-      </div>
-      <div style="background:#FFF6D4;border:2px solid #6E3A1F;border-top:0;padding:16px 22px">
-        <table style="border-collapse:collapse">
-          ${row('Pickup at', address)}
-          ${row('Cake', cakes)}
-          ${row('Paid', total)}
-          ${order.notes ? row('Your note', order.notes) : ''}
-        </table>
-      </div>
-      <p style="font-size:15px;color:#6F4429;margin:24px 0 0">Need to change something? Just reply to this email.</p>
-    </div>
-  </div>`;
+  const html = `<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
+<style>:root{color-scheme:light only;supported-color-schemes:light;}</style>
+</head>
+<body style="margin:0;padding:0;background:#ffffff">
+  <div style="max-width:520px;margin:0 auto;padding:28px 20px;font-family:Arial,Helvetica,sans-serif;color:${brown}">
+    <table role="presentation" style="border-collapse:collapse;margin:0 0 24px"><tr>
+      <td style="vertical-align:middle"><img src="${site}/apple-touch-icon.png" width="44" height="44" alt="" style="display:block;border:0;border-radius:22px"></td>
+      <td style="padding-left:12px;vertical-align:middle;font-size:22px;font-weight:800;color:${brown}">${escapeHtml(brand)}</td>
+    </tr></table>
+    <img src="${site}/email-hero.jpg" width="480" alt="A slice of ${escapeHtml(brand)} Basque cheesecake" style="display:block;width:100%;max-width:480px;height:auto;border:0;margin:0 0 24px">
+    <p style="font-size:24px;font-weight:800;margin:0 0 8px;line-height:1.25;color:${brown}">Thank you, ${escapeHtml(firstName)}.<br>Your order is booked.</p>
+    <p style="font-size:16px;margin:0 0 22px;color:${soft}">Here are your pickup details.</p>
+    <p style="font-size:13px;letter-spacing:1px;text-transform:uppercase;margin:0 0 4px;color:${soft}">Pickup</p>
+    <p style="font-size:21px;font-weight:800;margin:0 0 18px;line-height:1.3;color:${brown}">${escapeHtml(dayLabel(order.pickup_date))}<br>${escapeHtml(slotLabel(order.slot_hour))}</p>
+    <table role="presentation" style="border-collapse:collapse;width:100%;border-bottom:1px solid #E8DCCB">
+      ${row('Address', address)}
+      ${row('Cake', cakes)}
+      ${row('Paid', total)}
+      ${order.notes ? row('Your note', order.notes) : ''}
+    </table>
+    <p style="font-size:15px;margin:24px 0 0;color:${soft}">Need to change something? Just reply to this email.</p>
+    <p style="font-size:15px;margin:8px 0 0;color:${soft}">${escapeHtml(brand)} · <a href="${site}" style="color:${brown}">${site.replace('https://', '')}</a></p>
+  </div>
+</body></html>`;
 
   const nodemailer = (await import('nodemailer')).default;
   const transporter = nodemailer.createTransport({
