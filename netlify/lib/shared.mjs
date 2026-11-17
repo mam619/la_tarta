@@ -118,17 +118,43 @@ export const markPaid = async (orderId, sessionId) => {
   return data;
 };
 
+// ---- Sending email: Resend (orders@yourdomain) if set up, otherwise Gmail ----
+export const sendEmail = async ({ to, subject, html, text, fromName }) => {
+  const brand = optionalEnv('BRAND_NAME', 'La Tarta');
+  const name = fromName || brand;
+  const gmailUser = optionalEnv('GMAIL_USER');
+  const replyTo = optionalEnv('REPLY_TO', gmailUser);
+  const resendKey = optionalEnv('RESEND_API_KEY');
+
+  if (resendKey) {
+    const from = optionalEnv('MAIL_FROM', 'orders@latartalisboa.com');
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: `${name} <${from}>`, to: [to], subject, html, text,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
+    });
+    if (!res.ok) throw new Error(`Resend ${res.status}: ${(await res.text()).slice(0, 300)}`);
+    return;
+  }
+
+  const pass = optionalEnv('GMAIL_APP_PASSWORD').replace(/\s/g, '');
+  if (!gmailUser || !pass) {
+    console.warn('No email service configured, skipping email');
+    return;
+  }
+  const nodemailer = (await import('nodemailer')).default;
+  const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: gmailUser, pass } });
+  await transporter.sendMail({ from: `"${name}" <${gmailUser}>`, to, subject, text, html });
+};
+
 // ---- Customer confirmation email (sent from Gmail) ----
 const escapeHtml = (text) =>
   String(text).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 export const sendConfirmationEmail = async (order) => {
-  const user = optionalEnv('GMAIL_USER');
-  const pass = optionalEnv('GMAIL_APP_PASSWORD').replace(/\s/g, '');
-  if (!user || !pass) {
-    console.warn('Gmail not configured, skipping confirmation email');
-    return;
-  }
   const brand = optionalEnv('BRAND_NAME', 'La Tarta');
   const address = optionalEnv('PICKUP_ADDRESS', `${PICKUP_PUBLIC}, Lisboa`);
   const when = `${dayLabel(order.pickup_date)}, ${slotLabel(order.slot_hour)}`;
@@ -189,13 +215,7 @@ export const sendConfirmationEmail = async (order) => {
   </div>
 </body></html>`;
 
-  const nodemailer = (await import('nodemailer')).default;
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user, pass },
-  });
-  await transporter.sendMail({
-    from: `"${brand}" <${user}>`,
+  await sendEmail({
     to: order.email,
     subject: `Your ${brand} order: ${when}`,
     text,
@@ -206,10 +226,7 @@ export const sendConfirmationEmail = async (order) => {
 
 // ---- Plain email to yourself (daily summary) ----
 export const emailOwner = async (subject, text) => {
-  const user = optionalEnv('GMAIL_USER');
-  const pass = optionalEnv('GMAIL_APP_PASSWORD').replace(/\s/g, '');
-  if (!user || !pass) return;
-  const nodemailer = (await import('nodemailer')).default;
-  const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user, pass } });
-  await transporter.sendMail({ from: `"${optionalEnv('BRAND_NAME', 'La Tarta')} orders" <${user}>`, to: user, subject, text });
+  const to = optionalEnv('OWNER_EMAIL', optionalEnv('GMAIL_USER'));
+  if (!to) return;
+  await sendEmail({ to, subject, text, fromName: `${optionalEnv('BRAND_NAME', 'La Tarta')} orders` });
 };
